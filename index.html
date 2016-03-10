@@ -10,7 +10,7 @@
 </head>
 <body>
 <h1>Flappy Dragon</h1>
-<canvas id="myCanvas" width="480" height="400"></canvas>
+<canvas id="myCanvas" width="800" height="500"></canvas>
 
 <script>
   var canvas = document.getElementById("myCanvas");
@@ -19,7 +19,7 @@
   var x = canvas.width/2;
   var y = canvas.height/2;
   var pipeStart = canvas.width - 10
-  var pipeHeights = [150,175,200,225,250,275]
+  var pipeHeights = [0,50,100,150,200,250,300]
   var dx = 0;
   var dy = 1;
   var ballRadius = 10;
@@ -45,31 +45,25 @@
 
 
   function addPipe(x){
-    y = pipeHeights[Math.floor(Math.random() * 6)]
+    y = pipeHeights[Math.floor(Math.random() * 7)]
     pipes.push({
       x: pipeStart + x,
       y: y,
-      width: 50,
-      height: 320
+      width: 80,
+      height: 100
     })
 
-    upperPipes.push({
-      x: pipeStart + x,
-      y: 0,
-      width: 50,
-      height: y - 90
-    })
   }
 
 
   function drawBall() {
 
     if (dy > 0){
-      ctx.drawImage(dragonImage1, x, y, 40, 40)
+      ctx.drawImage(dragonImage1, x, y, 60, 60)
     } else if (dy === 0) {
-      ctx.drawImage(dragonImage3, x, y, 40, 40)
+      ctx.drawImage(dragonImage3, x, y, 60, 60)
     } else {
-      ctx.drawImage(dragonImage2, x, y, 40, 40)
+      ctx.drawImage(dragonImage2, x, y, 60, 60)
     }
 
   }
@@ -85,7 +79,7 @@
 
 
     function keyPressedhandler(e) {
-      if(e.keyCode === 32) {
+      if(e.keyCode === 32 && y > 0) {
         dy = -9
       }
     }
@@ -106,13 +100,9 @@
 
     pipes.forEach(function(pipe, idx){
       drawPipe(pipe)
-      drawPipe(upperPipes[idx])
-      upperPipes[idx].x --
       pipe.x --
-      if (y + ballRadius >= pipe.y && (x + ballRadius > pipe.x && x + ballRadius < pipe.x + pipe.width) ){
-        gameOver = true
-        debugger;
-      } else if (y + ballRadius <= upperPipes[idx].height && (x + ballRadius > pipe.x && x + ballRadius < pipe.x + pipe.width)) {
+      if (((y + 5 >= pipe.y && y + 5 <= pipe.y + pipe.height ) || (y + 55 >= pipe.y && y + 55 <= pipe.y + pipe.height))
+        && (x + ballRadius > pipe.x && x + ballRadius < pipe.x + pipe.width) ){
         gameOver = true
       } else if (x === pipe.x) {
         score += 1
