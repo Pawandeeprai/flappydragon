@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+    </style>
+</head>
+<body>
+<h1>Flappy Dragon</h1>
+<canvas id="myCanvas" width="480" height="400"></canvas>
+
+<script>
+  var canvas = document.getElementById("myCanvas");
+  var ctx = canvas.getContext("2d");
+  var score = 0
+  var x = canvas.width/2;
+  var y = canvas.height/2;
+  var pipeStart = canvas.width - 10
+  var pipeHeights = [150,175,200,225,250,275]
+  var dx = 0;
+  var dy = 1;
+  var ballRadius = 10;
+  var pipes = []
+  var upperPipes = []
+  var clouds = new Image();
+  var gameOver = false
+  clouds.src = "assets/images/cloud_scene_preview.png"
+  var dragonImage1 = new Image();
+  dragonImage1.src = "assets/images/dragon/frame-1.png"
+  var dragonImage2 = new Image();
+  dragonImage2.src = "assets/images/dragon/frame-3.png"
+  var dragonImage3 = new Image();
+  dragonImage3.src = "assets/images/dragon/frame-2.png"
+  var walls = new Image();
+  walls.src = "assets/images/kpa_blockA.png"
+
+  function drawGameOver(){
+    ctx.font = "80px Arial";
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText("Game Over", 20, 100);
+  }
+
+
+  function addPipe(x){
+    y = pipeHeights[Math.floor(Math.random() * 6)]
+    pipes.push({
+      x: pipeStart + x,
+      y: y,
+      width: 50,
+      height: 320
+    })
+
+    upperPipes.push({
+      x: pipeStart + x,
+      y: 0,
+      width: 50,
+      height: y - 90
+    })
+  }
+
+
+  function drawBall() {
+
+    if (dy > 0){
+      ctx.drawImage(dragonImage1, x, y, 40, 40)
+    } else if (dy === 0) {
+      ctx.drawImage(dragonImage3, x, y, 40, 40)
+    } else {
+      ctx.drawImage(dragonImage2, x, y, 40, 40)
+    }
+
+  }
+
+  function drawPipe(pipe){
+    var pattern = ctx.createPattern(walls, 'repeat-x');
+    ctx.beginPath();
+    ctx.drawImage(walls, pipe.x, pipe.y, pipe.width, pipe.height);
+    ctx.fillStyle = pattern;
+    ctx.fill();
+    ctx.closePath();
+  }
+
+
+    function keyPressedhandler(e) {
+      if(e.keyCode === 32) {
+        dy = -9
+      }
+    }
+
+  function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText("Score: "+score, 8, 20);
+  }
+
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(clouds, 0, 0, 800, 500)
+    drawBall();
+    y += dy;
+
+
+    pipes.forEach(function(pipe, idx){
+      drawPipe(pipe)
+      drawPipe(upperPipes[idx])
+      upperPipes[idx].x --
+      pipe.x --
+      if (y + ballRadius >= pipe.y && (x + ballRadius > pipe.x && x + ballRadius < pipe.x + pipe.width) ){
+        gameOver = true
+        debugger;
+      } else if (y + ballRadius <= upperPipes[idx].height && (x + ballRadius > pipe.x && x + ballRadius < pipe.x + pipe.width)) {
+        gameOver = true
+      } else if (x === pipe.x) {
+        score += 1
+      }
+
+    })
+    drawScore();
+
+    this.token = requestAnimationFrame(draw);
+    resDy();
+    if (gameOver) {
+      cancelAnimationFrame(this.token);
+      drawGameOver();
+    }
+  }
+
+  function resDy(){
+    if (dy < 1) {
+      dy += 1
+    }
+  }
+
+  document.addEventListener("keypress", keyPressedhandler, false);
+  var spacing = 0
+  for (var i = 0; i < 1000; i++){
+    addPipe(spacing)
+    spacing += 125
+  }
+
+  draw();
+</script>
+
+</body>
+</html>
